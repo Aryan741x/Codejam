@@ -30,7 +30,7 @@ class MusicApp:
         self.create_widgets()
 
     def create_widgets(self):
-        # Canvas for visual representation or screen
+         # Canvas for visual representation or screen
         self.canvas = tk.Canvas(self.master, bg="#3c0753", height=200, width=500,highlightthickness=0)
         self.canvas.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
@@ -64,7 +64,7 @@ class MusicApp:
 
         # Play Autotune Button
         play_autotune_button = tk.Button(playback_frame, text="Play Autotune", command=self.play_autotune,bg="#910A67")
-        play_autotune_button.place(x=400,y=-10)
+        play_autotune_button.pack(side=tk.LEFT, padx=10)
 
         # Play Original Button
         play_original_button = tk.Button(playback_frame, text="Play Original", command=self.play_original,bg="#910A67")
@@ -72,10 +72,10 @@ class MusicApp:
 
         # Generate Melody Button
         generate_melody_button = tk.Button(self.master, text="Generate Melody", command=self.generate_melody,bg="#910A67")
-        generate_melody_button.grid(row=0, column=2, padx=10, pady=25, sticky="ne")
+        generate_melody_button.grid(row=0, column=2, padx=50, pady=25, sticky="ne")
 
         # Load GIF
-        self.gif_path = "./pic.gif"  # Replace with the path to your GIF file
+        self.gif_path = "src\pic.gif"
         self.gif = Image.open(self.gif_path)
         self.gif_frames = [ImageTk.PhotoImage(self.gif_frame) for self.gif_frame in ImageSequence.Iterator(self.gif)]
 
