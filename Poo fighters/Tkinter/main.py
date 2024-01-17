@@ -5,72 +5,81 @@ import pyaudio
 import wave
 from pydub import AudioSegment
 from pydub.playback import play
+from PIL import Image,ImageTk,ImageSequence
 
 class MusicApp:
     def __init__(self, master):
         self.master = master
-        self.master.title("AutoTune Music App")
-
+        self.master.title("The Rhythm")
+        self.master.configure(bg="#030637")
         self.is_recording = False
         self.is_playing = False
         self.recorded_frames = []
         self.autotuned_audio = None
         self.original_audio = None
         self.audio_stream = None
-        self.playback_thread = None  
+        self.playback_thread = None 
+        self.animation_interval = 50 #milisecond
+        self.animation_object = []
+        
         self.create_widgets()
 
     def create_widgets(self):
         # Canvas for visual representation or screen
-        self.canvas = tk.Canvas(self.master, bg="white", height=200, width=500)
+        self.canvas = tk.Canvas(self.master, bg="#3c0753", height=200, width=500,highlightthickness=0)
         self.canvas.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
-        # Generate Melody Button
-        generate_melody_button = tk.Button(self.master, text="Generate Melody", command=self.generate_melody)
-        generate_melody_button.grid(row=0, column=2, padx=10, pady=10, sticky="ne")
-
         # Recording Frame
-        recording_frame = tk.Frame(self.master, padx=10, pady=10)
+        recording_frame = tk.Frame(self.master, padx=10, pady=10,bg="#720455")
         recording_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
         # Record Button
-        self.record_button = tk.Button(recording_frame, text="Record", command=self.toggle_recording)
+        self.record_button = tk.Button(recording_frame, text="Record", command=self.toggle_recording,bg="#910A67")
         self.record_button.pack(side=tk.LEFT, padx=10)
 
         # Stop Recording Button
-        self.stop_button = tk.Button(recording_frame, text="Stop", command=self.stop_recording, state=tk.DISABLED)
+        self.stop_button = tk.Button(recording_frame, text="Stop", command=self.stop_recording, state=tk.DISABLED,bg="#910A67")
         self.stop_button.pack(side=tk.LEFT)
 
         # Autotune Frame
-        autotune_frame = tk.Frame(self.master, padx=10, pady=10)
+        autotune_frame = tk.Frame(self.master, padx=10, pady=10,bg="#720455")
         autotune_frame.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
 
         # Autotune Display Button
-        autotune_display_button = tk.Button(autotune_frame, text="Autotune Pitch", command=self.display_autotune_pitch)
+        autotune_display_button = tk.Button(autotune_frame, text="Autotune Pitch", command=self.display_autotune_pitch,bg="#910A67")
         autotune_display_button.pack(side=tk.LEFT, padx=10)
 
         # Original Pitch Display Button
-        original_pitch_button = tk.Button(autotune_frame, text="Original Pitch", command=self.display_original_pitch)
+        original_pitch_button = tk.Button(autotune_frame, text="Original Pitch", command=self.display_original_pitch,bg="#910A67")
         original_pitch_button.pack(side=tk.LEFT)
 
         # Playback Frame
-        playback_frame = tk.Frame(self.master, padx=10, pady=10)
+        playback_frame = tk.Frame(self.master, padx=10, pady=10,bg="#720455")
         playback_frame.grid(row=1, column=2, padx=10, pady=10, sticky="nsew")
 
         # Play Autotune Button
-        play_autotune_button = tk.Button(playback_frame, text="Play Autotune", command=self.play_autotune)
+        play_autotune_button = tk.Button(playback_frame, text="Play Autotune", command=self.play_autotune,bg="#910A67")
         play_autotune_button.pack(side=tk.LEFT, padx=10)
 
         # Play Original Button
-        play_original_button = tk.Button(playback_frame, text="Play Original", command=self.play_original)
+        play_original_button = tk.Button(playback_frame, text="Play Original", command=self.play_original,bg="#910A67")
         play_original_button.pack(side=tk.LEFT)
 
-        for i in range(3):
-            self.master.columnconfigure(i, weight=1)
+        # Load GIF
+        self.gif_path = "./pic.gif"  # Replace with the path to your GIF file
+        self.gif = Image.open(self.gif_path)
+        self.gif_frames = [ImageTk.PhotoImage(self.gif_frame) for self.gif_frame in ImageSequence.Iterator(self.gif)]
 
-        self.master.rowconfigure(0, weight=1)
-        self.master.rowconfigure(1, weight=1)
-
+        # Display GIF on canvas
+        self.gif_index = 0
+        self.gif_object = self.canvas.create_image(100, 100, image=self.gif_frames[self.gif_index])
+        self.animate_gif()
+    
+    def animate_gif(self):
+        self.gif_index = (self.gif_index + 1) % len(self.gif_frames)
+        self.canvas.itemconfig(self.gif_object, image=self.gif_frames[self.gif_index])
+        self.master.after(self.animation_interval, self.animate_gif)
+    
     def toggle_recording(self):
         if not self.is_recording:
             self.start_recording()
@@ -116,32 +125,34 @@ class MusicApp:
             wf.setframerate(44100)
             wf.writeframes(b"".join(self.recorded_frames))
             wf.close()
+
             self.original_audio = AudioSegment.from_wav(file_path)
             self.play_original()  
 
     def display_autotune_pitch(self):
         if self.original_audio is not None:
-            # Autotune the original audio
+            
             self.autotuned_audio = self.autotune_audio(self.original_audio)
-            #logic to display autotune pitch
+           
 
     def display_original_pitch(self):
-        #logic to display original pitch
+       
         pass
 
     def play_autotune(self):
         if self.autotuned_audio is not None:
-            self.stop_playback()  
+            self.stop_playback() 
             self.playback_thread = threading.Thread(target=self.play_audio, args=(self.autotuned_audio,))
             self.playback_thread.start()
 
     def play_original(self):
         if self.original_audio is not None:
-            self.stop_playback()  
+            self.stop_playback() 
             self.playback_thread = threading.Thread(target=self.play_audio, args=(self.original_audio,))
             self.playback_thread.start()
 
     def stop_playback(self):
+        
         if self.is_playing and self.playback_thread.is_alive():
             self.playback_thread.join()  
             self.is_playing = False
@@ -151,18 +162,16 @@ class MusicApp:
         play(audio)
 
     def autotune_audio(self, audio):
-        autotuned_audio = audio.speedup(playback_speed=1.5) 
+        #Add the code for autotuning audeo here, below is just sample code
+        autotuned_audio = audio.speedup(playback_speed=1.5)  
         return autotuned_audio
 
     def check_recording_status(self):
+       
         if self.is_recording:
             self.master.after(100, self.check_recording_status)
         else:
             self.stop_button.config(state=tk.DISABLED)
-
-    def generate_melody(self):
-        # logic to generate melody
-        pass
 
 if __name__ == "__main__":
     root = tk.Tk()
