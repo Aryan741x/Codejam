@@ -86,8 +86,7 @@ class MusicApp:
 
 
     def generate_melody(self):
-        external_script_path = "./AI_Melody/mgen.py"
-        subprocess.run(["python", external_script_path])
+        pass
     
 
 # Increment gif index, update canvas with next frame, and schedule recursive animation.
@@ -212,7 +211,7 @@ class MusicApp:
 
 
 
-
+# Play the original audio file using a separate thread.
     def play_original(self):
         # Specify the path to your autotuned audio file
         autotuned_file_path = r'C:\Users\Aryan\Desktop\Codejam\Work\Codejam-main\Codejam-main\Poo fighters\src\song.wav'
@@ -228,9 +227,7 @@ class MusicApp:
         self.playback_thread.start()
 
 
-
-
-
+# Stop audio playback if currently playing and wait for the playback thread to join.
     def stop_playback(self):
         
         if self.is_playing and self.playback_thread.is_alive():
@@ -238,29 +235,20 @@ class MusicApp:
             self.is_playing = False
 
 
-
-
-
-
+# Play audio and set playback state to indicate ongoing playback.
     def play_audio(self, audio):
         self.is_playing = True
         play(audio)
 
 
-
-
-
-
+# Autotune audio (sample code - replace with actual autotuning implementation).
     def autotune_audio(self, audio):
         #Add the code for autotuning audeo here, below is just sample code
         autotuned_audio = audio.speedup(playback_speed=1.5)  
         return autotuned_audio
 
 
-
-
-
-
+# Check recording status recursively. Disable stop button when recording is stopped.
     def check_recording_status(self):
        
         if self.is_recording:
