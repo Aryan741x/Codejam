@@ -1,4 +1,5 @@
-Project Name
+The Rhythm
+
 Overview
 This project encompasses two main functionalities: recording and processing sound, and melody generation using a genetic algorithm. The first part involves capturing audio, applying auto-tuning, and visualizing Fourier graphs. 
 The second part focuses on generating melodies through a genetic algorithm, providing a diverse set of musical sequences.
